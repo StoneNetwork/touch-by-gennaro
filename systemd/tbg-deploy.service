@@ -1,0 +1,16 @@
+
+[Unit]
+Description=Touch by Gennaro Deploy API
+After=network.target
+
+[Service]
+User=wpbot
+Group=wpbot
+EnvironmentFile=/etc/default/tbg-deploy
+WorkingDirectory=/opt/tbg-deploy/server
+ExecStart=/usr/bin/python3 /opt/tbg-deploy/server/deploy_api.py
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

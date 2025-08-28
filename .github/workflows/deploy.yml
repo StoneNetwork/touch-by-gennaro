@@ -1,0 +1,34 @@
+
+name: Deploy Touch by Gennaro
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, wp-lxc]
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Ensure zip tool
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y zip
+
+      - name: Prepare /home/wpbot and build site.zip
+        run: |
+          mkdir -p /home/wpbot
+          if [ -d "./site" ]; then
+            cd site && zip -r /home/wpbot/site.zip . && cd -
+          else
+            echo "❌ Map ./site bestaat niet. Zet je HTML-site in ./site/ en push opnieuw."
+            exit 1
+          fi
+          ls -lh /home/wpbot/site.zip
+
+      - name: Run idempotent deploy (WP-CLI)
+        run: |
+          sudo bash ./examples/deploy.sh
