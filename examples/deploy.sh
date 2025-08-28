@@ -155,8 +155,10 @@ fi
 sudo -u www-data -H -- wp --path="$WP" option update show_on_front page
 sudo -u www-data -H -- wp --path="$WP" option update page_on_front "$HOME_ID"
 
-sudo -u www-data -H -- wp --path="$WP" rewrite structure "/%postname%/" --hard
-sudo -u www-data -H -- wp --path="$WP" rewrite flush --hard
+set +e
+sudo -u www-data -H -- wp --path="$WP" rewrite structure "/%postname%/" --hard || true
+sudo -u www-data -H -- wp --path="$WP" rewrite flush --hard || true
+set -e
 
 MENU_ID=$(sudo -u www-data -H -- wp --path="$WP" menu list --fields=term_id --format=ids | head -n1)
 if [ -z "$MENU_ID" ]; then
