@@ -18,14 +18,14 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y zip
 
-      - name: Sanitize HTML (strip comments + Framer/HTTrack)
+      - name: Sanitize HTML (strip framer badges safely)
         run: |
           shopt -s globstar nullglob
           for f in site/**/*.html site/*.html; do
-            # verwijder HTML comments met Framer/HTTrack tekst
-            sed -i -E '/Built with Framer|Mirrored from|Made in Framer|More Templates|Use for Free/d' "$f"
-            # verwijder losse "Made in Framer" anchors
-            sed -i -E 's@<a[^>]*>Made in Framer</a>@@Ig' "$f" || true
+            # verwijder alleen de FRAGMENTEN in-line (niet de hele regel)
+            sed -i -E 's/<!--[^<]*Built with Framer[^>]*-->//g' "$f" || true
+            sed -i -E 's/<!--[^<]*Mirrored from[^>]*-->//g' "$f" || true
+            sed -i -E 's@<a[^>]*>(Made in Framer|More Templates|Use for Free)</a>@@Ig' "$f" || true
           done
 
       - name: Prepare /home/wpbot and build site.zip
