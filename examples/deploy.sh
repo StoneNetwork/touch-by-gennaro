@@ -98,6 +98,25 @@ cat > "$TD/footer.php" <<'PHP'
 </html>
 PHP
 
+# index.php (fallback vereist door WordPress)
+if [ ! -f "$TD/index.php" ]; then
+  cat > "$TD/index.php" <<'PHP'
+<?php get_header(); ?>
+<main id="primary">
+<?php
+if ( is_front_page() ) {
+  echo do_shortcode('[embed_html file="site/index.html"]');
+} else {
+  if ( have_posts() ) { while ( have_posts() ) { the_post(); the_content(); } }
+  else { echo "<p>No content.</p>"; }
+}
+?>
+</main>
+<?php get_footer(); ?>
+PHP
+fi
+
+
 cat > "$TD/front-page.php" <<'PHP'
 <?php get_header(); ?>
 <?php echo do_shortcode("[embed_html file=\"site/index.html\"]"); ?>
