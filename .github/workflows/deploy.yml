@@ -18,14 +18,22 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y zip
 
-      - name: Sanitize HTML (strip framer badges safely)
+      - name: Sanitize HTML (brand as Touch by Gennaro)
         run: |
           shopt -s globstar nullglob
           for f in site/**/*.html site/*.html; do
-            # verwijder alleen de FRAGMENTEN in-line (niet de hele regel)
-            sed -i -E 's/<!--[^<]*Built with Framer[^>]*-->//g' "$f" || true
-            sed -i -E 's/<!--[^<]*Mirrored from[^>]*-->//g' "$f" || true
-            sed -i -E 's@<a[^>]*>(Made in Framer|More Templates|Use for Free)</a>@@Ig' "$f" || true
+            # vervang comments/badges
+            sed -i -E 's/<!--[^<]*Built with Framer[^>]*-->/<!-- Built by Touch by Gennaro -->/Ig' "$f" || true
+            sed -i -E 's/<!--[^<]*Mirrored from[^>]*-->/<!-- Built by Touch by Gennaro -->/Ig' "$f" || true
+            sed -i -E 's@<a[^>]*>(Made in Framer|More Templates|Use for Free)</a>@<!-- Removed: \1 -->@Ig' "$f" || true
+
+            # titel & meta’s (pas de teksten hieronder aan naar jouw smaak)
+            sed -i -E 's@<title>[^<]*</title>@<title>Touch by Gennaro</title>@I' "$f" || true
+            sed -i -E 's@<meta name="generator" content="[^"]+"@<meta name="generator" content="Touch by Gennaro"@Ig' "$f" || true
+            sed -i -E 's@<meta name="description" content="[^"]*"@<meta name="description" content="Portfolio van Touch by Gennaro — werk, projecten en contact"@Ig' "$f" || true
+
+            # framer specifieke meta weg
+            sed -i -E 's@<meta name="framer-search-index"[^>]*>@@Ig' "$f" || true
           done
 
       - name: Prepare /home/wpbot and build site.zip
